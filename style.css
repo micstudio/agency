@@ -1,0 +1,482 @@
+.img-responsive {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.img-responsive2 {
+  width: 120%;
+  height: auto;
+}
+
+body {
+  color: white !important;
+  font-size: 100%;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-family: 'Galada', cursive;
+}
+
+h3 {
+  font-family: 'Montserrat', sans-serif;
+}
+
+header {
+  width: 100%;
+  height: 100vh;
+  background: url("images/header-bg.png") no-repeat;
+  background-position: 50% 50%;
+  background-size: cover;
+}
+
+header .row .navbar-light .nav-item.active .nav-link,
+header .row .navbar-light .nav-item:focus .nav-link,
+header .row .navbar-light .nav-item:hover .nav-link {
+  color: #ffffff;
+}
+
+header .row .navbar-custom a {
+  color: white !important;
+}
+
+header .row .navbar-custom a:hover {
+  color: #0081ff !important;
+  border-top: 2px solid #0081ff;
+}
+
+header .row .navbar-custom li {
+  padding: 10px;
+}
+
+header .row-left h2 {
+  display: block;
+  font-size: 1.5rem;
+  font-family: 'Galada', cursive;
+  margin-top: 6em;
+}
+
+header .row-left span:nth-child(2) {
+  font-size: 2.5em;
+  font-weight: 800;
+  font-family: 'Montserrat', sans-serif;
+}
+
+header .row-left span:nth-child(3) {
+  font-size: 2.5em;
+  font-weight: 800;
+  color: #0081ff;
+  font-family: 'Montserrat', sans-serif;
+}
+
+header .row-left span:nth-child(4) {
+  display: block;
+  font-family: 'Lato', sans-serif;
+  font-size: 1.4rem;
+  margin-bottom: 5em;
+}
+
+header .row-left .btn {
+  margin-top: 50px;
+  background: #0081ff !important;
+}
+
+.who {
+  padding-top: 100px;
+  min-height: 600px;
+  background: #0081ff;
+}
+
+.who h3 {
+  font-weight: 700;
+  margin: 50px 0 50px 0;
+}
+
+.who p {
+  font-family: 'Lato', sans-serif;
+  margin: 0 0 50px 0;
+}
+
+.who .btn {
+  margin: 0 0 50px 0;
+}
+
+.services {
+  padding-top: 100px;
+  min-height: 600px;
+  background: #007af3;
+}
+
+.services h3 {
+  font-weight: 700;
+  font-size: 2vw;
+}
+
+.profile {
+  z-index: 2;
+}
+
+.profile h2 {
+  color: #575757;
+  margin: 100px 0 0 0;
+}
+
+.profile H3 {
+  color: black;
+  font-weight: 800;
+  font-size: 2em;
+}
+
+.profile img {
+  width: 100%;
+  max-height: 784px;
+}
+
+.profile div {
+  margin: 0;
+  padding: 0;
+}
+
+.clients {
+  margin-top: -10px;
+  margin-bottom: 100px;
+  position: relative;
+  z-index: 5;
+  min-height: 700px;
+  background: url("images/client-bg.png") no-repeat;
+  background-position: 50% 50%;
+  background-size: cover;
+}
+
+.clients .logo {
+  margin-top: 100px;
+}
+
+.clients h2 {
+  margin: 100px 0 0 0;
+}
+
+.clients H3 {
+  font-weight: 800;
+  font-size: 2em;
+}
+
+.blog {
+  min-height: 500px;
+  color: black !important;
+}
+
+.blog span {
+  display: block;
+  text-align: center;
+}
+
+.blog h2 {
+  color: #575757;
+  font-size: 2.5em;
+}
+
+.blog .title {
+  font-size: 2.5em;
+  font-weight: 800;
+  color: black;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.blog p {
+  font-family: 'Lato', sans-serif;
+  color: #575757;
+}
+
+.blog .blog {
+  grid-area: blog;
+  min-height: 200px;
+}
+
+.blog .blog-2 {
+  grid-area: blog-2;
+  background: #0081ff;
+  color: white !important;
+  font-family: 'Lato', sans-serif;
+  padding: 50px;
+  font-size: 1.2em;
+  font-weight: bold;
+  min-height: 200px;
+}
+
+.blog .blog-3 {
+  grid-area: blog-3;
+  background: #eaeaea;
+  min-height: 200px;
+}
+
+.blog .blog-3 span:nth-child(1) {
+  font-family: 'Lato', sans-serif;
+  margin-top: 10%;
+}
+
+.blog .blog-3 span:nth-child(2) {
+  font-weight: 800;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2em;
+  margin-top: 15%;
+}
+
+.blog .blog-4 {
+  grid-area: blog-4;
+  background: black;
+  color: white;
+  min-height: 200px;
+}
+
+.blog .blog-4 span:nth-child(1) {
+  font-family: 'Lato', sans-serif;
+  margin-top: 10%;
+}
+
+.blog .blog-4 span:nth-child(2) {
+  font-weight: 800;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2em;
+  margin-top: 15%;
+}
+
+.blog .blog-5 {
+  grid-area: blog-5;
+  background: url("images/blog4-bg.png") no-repeat;
+  background-position: 50% 50%;
+  background-size: cover;
+  color: white;
+  min-height: 200px;
+}
+
+.blog .blog-5 span:nth-child(1) {
+  font-family: 'Lato', sans-serif;
+  margin-top: 10%;
+}
+
+.blog .blog-5 span:nth-child(2) {
+  font-weight: 800;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2em;
+  margin-top: 40%;
+}
+
+.blog .blog-5 span:nth-child(3) {
+  padding: 10px 10px;
+}
+
+.blog .blog-6 {
+  grid-area: blog-6;
+  background: #e91d62;
+  color: white;
+  min-height: 200px;
+}
+
+.blog .blog-6 span:nth-child(1) {
+  font-family: 'Lato', sans-serif;
+  margin-top: 2%;
+}
+
+.blog .blog-6 span:nth-child(2) {
+  font-weight: 800;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2em;
+  margin-top: 3%;
+}
+
+.blog .blog-6 span:nth-child(3) {
+  font-weight: bold;
+  padding: 20px 20px;
+}
+
+.contact {
+  padding: 50px 0 0 0;
+  margin: 100px 0 0 0;
+  min-height: 500px;
+  background: black;
+  color: white;
+  font-size: 0.8em;
+  font-weight: bolder;
+  font-family: 'Lato', sans-serif;
+}
+
+.contact h3 {
+  font-weight: 800;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.contact__call {
+  position: relative;
+}
+
+.contact__call i {
+  position: absolute;
+  top: 0;
+  left: -45px;
+}
+
+.contact__email, .contact__map {
+  position: relative;
+}
+
+.contact__email i, .contact__map i {
+  position: absolute;
+  top: 0;
+  left: -50px;
+}
+
+.contact__form span {
+  min-width: 1200px;
+  border: 2px solid green;
+}
+
+.contact input {
+  border: none;
+  background: #2b2b2b;
+  border-radius: 20px;
+  height: 25px;
+  width: 100%;
+}
+
+.contact input:focus {
+  border: 1px solid #0081ff;
+  outline: none;
+}
+
+.contact .input-msg {
+  height: 100px;
+}
+
+.contact .logos {
+  margin-top: 30px;
+}
+
+.contact .logos i:hover {
+  border-top: 2px solid #0081ff;
+}
+
+@media (max-width: 991.98px) {
+  .blog {
+    display: inline;
+  }
+}
+
+@media (min-width: 991.98px) {
+  .grid-container {
+    display: -ms-grid;
+    display: grid;
+    -ms-grid-columns: 1fr 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    -ms-grid-rows: 1fr 1fr 1fr;
+        grid-template-rows: 1fr 1fr 1fr;
+        grid-template-areas: "blog blog blog-5 blog-5" "blog-2 blog-2 blog-5 blog-5" "blog-3 blog-4 blog-6 blog-6";
+    grid-gap: 1em;
+  }
+  .blog {
+    -ms-grid-row: 1;
+    -ms-grid-column: 1;
+    -ms-grid-column-span: 2;
+    grid-area: blog;
+    min-height: 200px;
+  }
+  .blog-2 {
+    -ms-grid-row: 2;
+    -ms-grid-column: 1;
+    -ms-grid-column-span: 2;
+    grid-area: blog-2;
+    background: #0081ff;
+    color: white !important;
+    font-family: 'Lato', sans-serif;
+    padding: 50px;
+    font-size: 1.2em;
+    font-weight: bold;
+    min-height: 200px;
+  }
+  .blog-3 {
+    -ms-grid-row: 3;
+    -ms-grid-column: 1;
+    grid-area: blog-3;
+    background: #eaeaea;
+    min-height: 200px;
+  }
+  .blog-3 span:nth-child(1) {
+    font-family: 'Lato', sans-serif;
+    margin-top: 10%;
+  }
+  .blog-3 span:nth-child(2) {
+    font-weight: 800;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2em;
+    margin-top: 15%;
+  }
+  .blog-4 {
+    -ms-grid-row: 3;
+    -ms-grid-column: 2;
+    grid-area: blog-4;
+    background: black;
+    color: white;
+    min-height: 200px;
+  }
+  .blog-4 span:nth-child(1) {
+    font-family: 'Lato', sans-serif;
+    margin-top: 10%;
+  }
+  .blog-4 span:nth-child(2) {
+    font-weight: 800;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2em;
+    margin-top: 15%;
+  }
+  .blog-5 {
+    -ms-grid-row: 1;
+    -ms-grid-row-span: 2;
+    -ms-grid-column: 3;
+    -ms-grid-column-span: 2;
+    grid-area: blog-5;
+    background: url("images/blog4-bg.png") no-repeat;
+    background-position: 50% 50%;
+    background-size: cover;
+    color: white;
+    min-height: 200px;
+  }
+  .blog-5 span:nth-child(1) {
+    font-family: 'Lato', sans-serif;
+    margin-top: 10%;
+  }
+  .blog-5 span:nth-child(2) {
+    font-weight: 800;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2em;
+    margin-top: 40%;
+  }
+  .blog-5 span:nth-child(3) {
+    padding: 10px 10px;
+  }
+  .blog-6 {
+    -ms-grid-row: 3;
+    -ms-grid-column: 3;
+    -ms-grid-column-span: 2;
+    grid-area: blog-6;
+    background: #e91d62;
+    color: white;
+    min-height: 200px;
+  }
+  .blog-6 span:nth-child(1) {
+    font-family: 'Lato', sans-serif;
+    margin-top: 2%;
+  }
+  .blog-6 span:nth-child(2) {
+    font-weight: 800;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2em;
+    margin-top: 3%;
+  }
+  .blog-6 span:nth-child(3) {
+    font-weight: bold;
+    padding: 20px 20px;
+  }
+}
+/*# sourceMappingURL=style.css.map */
