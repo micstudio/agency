@@ -44,7 +44,6 @@ header .row .navbar-custom a {
 
 header .row .navbar-custom a:hover {
   color: #0081ff !important;
-  border-top: 2px solid #0081ff;
 }
 
 header .row .navbar-custom li {
