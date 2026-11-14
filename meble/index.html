@@ -1,0 +1,662 @@
+<title>Rozpiska Mebli</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: drafting-table split — inputs on a narrow "sheet" on the left, the furniture schedule (zestawienie) on the right; stacks on phones. */
+:root {
+  --bg: #eef0ee;
+  --sheet: #fbfcfb;
+  --fg: #1d2421;
+  --muted: #5d6963;
+  --line: #d3d9d5;
+  --accent: #9a5b1e;      /* oak */
+  --accent-ink: #ffffff;
+  --accent-soft: #f3e6d8;
+  --ok: #2f7a4f;
+  --warn: #a86a00;
+  --bad: #b23b2e;
+  --ex: #6b5bd0;
+  --f-display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --r: 6px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141917; --sheet: #1b211e; --fg: #e4e9e6; --muted: #98a59e; --line: #2e3733;
+  --accent: #d9944f; --accent-ink: #1a1208; --accent-soft: #3a2a1b;
+  --ok: #5fc08a; --warn: #e0a93a; --bad: #ef7a6c; --ex: #a99cf2; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #141917; --sheet: #1b211e; --fg: #e4e9e6; --muted: #98a59e; --line: #2e3733;
+  --accent: #d9944f; --accent-ink: #1a1208; --accent-soft: #3a2a1b;
+  --ok: #5fc08a; --warn: #e0a93a; --bad: #ef7a6c; --ex: #a99cf2; color-scheme: dark }
+
+* { box-sizing: border-box }
+[hidden] { display: none !important }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-body); font-size: 14px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 40px }
+h1, h2, h3 { font-family: var(--f-display); text-wrap: balance; margin: 0 }
+.wrap { max-width: 1320px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px }
+header { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; border-bottom: 2px solid var(--fg); padding-bottom: 12px }
+header h1 { font-size: clamp(26px, 4vw, 36px); font-weight: 800; letter-spacing: -0.02em }
+header p { margin: 4px 0 0; color: var(--muted); max-width: 60ch }
+.stamp { font-family: var(--f-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); border: 1px solid var(--line); padding: 4px 8px; border-radius: 3px }
+
+.grid { display: grid; grid-template-columns: minmax(300px, 400px) minmax(0, 1fr); gap: 20px; align-items: start }
+@media (max-width: 900px) { .grid { grid-template-columns: minmax(0, 1fr) } }
+.sheet { background: var(--sheet); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; display: flex; flex-direction: column; gap: 16px; min-width: 0 }
+.label { font-family: var(--f-mono); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted) }
+.sec-h { display: flex; align-items: baseline; justify-content: space-between; gap: 8px }
+.sec-h h2 { font-size: 17px; font-weight: 700 }
+
+.drop { border: 1.5px dashed var(--line); border-radius: var(--r); padding: 18px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s }
+.drop:hover, .drop.over, .drop:focus-visible { border-color: var(--accent); background: var(--accent-soft); outline: none }
+.drop strong { display: block; font-size: 14px }
+.drop span { color: var(--muted); font-size: 12px }
+.thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px }
+.thumb { position: relative; border: 1px solid var(--line); border-radius: 4px; overflow: hidden; background: var(--bg); display: flex; flex-direction: column }
+.thumb img { width: 100%; aspect-ratio: 4/3; object-fit: cover; display: block }
+.thumb select { border: 0; border-top: 1px solid var(--line); font: 11px var(--f-body); padding: 3px 4px; background: var(--sheet); color: var(--fg); width: 100% }
+.thumb button { position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border-radius: 50%; border: 0; background: rgba(0,0,0,.6); color: #fff; cursor: pointer; font-size: 13px; line-height: 1 }
+
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0 }
+.field label { font-size: 12px; font-weight: 600 }
+.field small { color: var(--muted); font-size: 11.5px }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px }
+input, select, textarea { font: 14px var(--f-body); color: var(--fg); background: var(--sheet); border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px; width: 100%; min-width: 0 }
+textarea { resize: vertical; min-height: 64px }
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; border-color: transparent }
+.checks { display: flex; flex-wrap: wrap; gap: 6px }
+.chk { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; font-size: 12.5px; cursor: pointer; user-select: none }
+.chk input { width: auto; margin: 0; accent-color: var(--accent) }
+
+.btn { font: 600 14px var(--f-body); border-radius: 4px; padding: 9px 14px; border: 1px solid var(--line); background: var(--sheet); color: var(--fg); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px }
+.btn:hover { border-color: var(--fg) }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent) }
+.btn.primary:hover { filter: brightness(1.07) }
+.btn:disabled { opacity: .5; cursor: not-allowed }
+.btn.sm { padding: 5px 10px; font-size: 12.5px }
+.btn.ghost { border-color: transparent; background: transparent }
+.actions { display: flex; flex-wrap: wrap; gap: 8px }
+.status { font-size: 13px; color: var(--muted); min-height: 1.5em }
+.status.err { color: var(--bad) }
+.spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin .8s linear infinite; display: inline-block; vertical-align: -2px }
+@keyframes spin { to { transform: rotate(360deg) } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none } }
+
+/* Results */
+.banner { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--ex); color: var(--fg); background: color-mix(in srgb, var(--ex) 10%, transparent); padding: 10px 12px; border-radius: var(--r); font-size: 13px }
+.banner b { color: var(--ex) }
+.summary { color: var(--fg); max-width: 75ch; margin: 0 }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px }
+.tile { border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px; display: flex; flex-direction: column; gap: 2px }
+.tile .v { font-family: var(--f-display); font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums }
+.tile .v.over { color: var(--bad) }
+.tile .s { font-size: 12px; color: var(--muted) }
+
+.roomnav { display: flex; flex-wrap: wrap; gap: 6px }
+.roomnav button { font: 500 12.5px var(--f-body); border: 1px solid var(--line); background: transparent; color: var(--fg); border-radius: 999px; padding: 4px 10px; cursor: pointer; font-variant-numeric: tabular-nums }
+.roomnav button[aria-pressed="true"] { background: var(--fg); color: var(--sheet); border-color: var(--fg) }
+
+.room { display: flex; flex-direction: column; gap: 6px }
+.room-h { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; padding-top: 6px }
+.room-h h3 { font-size: 16px; font-weight: 700 }
+.room-h .sum { font-family: var(--f-mono); font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r) }
+table { border-collapse: collapse; width: 100%; min-width: 900px; font-size: 13px }
+th { text-align: left; font: 500 10.5px var(--f-mono); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); padding: 7px 8px; border-bottom: 1px solid var(--line); background: var(--bg); white-space: nowrap }
+td { padding: 2px 4px; border-bottom: 1px solid var(--line); vertical-align: middle }
+tr:last-child td { border-bottom: 0 }
+td.num, th.num { text-align: right }
+td [contenteditable] { padding: 5px 4px; border-radius: 3px; min-height: 1.5em; outline: none }
+td [contenteditable]:hover { background: var(--bg) }
+td [contenteditable]:focus { background: var(--accent-soft); box-shadow: inset 0 0 0 1px var(--accent) }
+td.num [contenteditable], td.dim [contenteditable] { font-family: var(--f-mono); font-variant-numeric: tabular-nums; text-align: right }
+td.dim { white-space: nowrap }
+td.dim .x { color: var(--muted); padding: 0 1px }
+td.dim span[contenteditable] { display: inline-block; min-width: 2.6em }
+.src { display: inline-block; font: 500 10.5px var(--f-mono); text-transform: uppercase; letter-spacing: .05em; padding: 2px 6px; border-radius: 3px; border: 1px solid currentColor; white-space: nowrap; cursor: pointer; background: transparent }
+.src.plan { color: var(--ok) } .src.wiz { color: var(--accent) } .src.oba { color: var(--fg) } .src.sug { color: var(--warn) }
+td .del { border: 0; background: transparent; color: var(--muted); cursor: pointer; font-size: 16px; padding: 4px 8px; border-radius: 3px }
+td .del:hover { color: var(--bad); background: var(--bg) }
+.addrow { align-self: flex-start }
+
+.qs { border-left: 3px solid var(--warn); padding: 4px 0 4px 12px; display: flex; flex-direction: column; gap: 4px }
+.qs ul { margin: 0; padding-left: 18px }
+.refine { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line); padding-top: 14px }
+.refine-row { display: flex; gap: 8px; flex-wrap: wrap }
+.refine-row textarea { flex: 1 1 260px; min-height: 44px }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; font-size: 12px; color: var(--muted) }
+.empty { color: var(--muted); padding: 30px 10px; text-align: center }
+.toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); background: var(--fg); color: var(--sheet); padding: 8px 14px; border-radius: 4px; font-size: 13px; z-index: 20 }
+.copyout { width: 100%; min-height: 160px; font: 12px var(--f-mono) }
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Rozpiska Mebli</h1>
+      <p>Wrzuć rzut mieszkania z meblami i wizualizacje, dopisz dane. Claude odczyta pomieszczenia i rozpisze każdy mebel z wymiarami, materiałem, ilością i szacunkową ceną.</p>
+    </div>
+    <span class="stamp" id="stamp">Zestawienie · v1</span>
+  </header>
+
+  <div class="grid">
+    <!-- INPUTS -->
+    <section class="sheet" aria-labelledby="in-h">
+      <div class="sec-h"><h2 id="in-h">Materiały i dane</h2><span class="label">Arkusz A</span></div>
+
+      <div class="field">
+        <label for="file">Rzuty i wizualizacje</label>
+        <div class="drop" id="drop" tabindex="0" role="button" aria-describedby="drop-hint">
+          <strong>Upuść pliki lub kliknij, aby wybrać</strong>
+          <span id="drop-hint">JPG, PNG, WebP, PDF (każda strona osobno) · możesz też wkleić Ctrl+V</span>
+        </div>
+        <input type="file" id="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,application/pdf" hidden>
+        <div class="thumbs" id="thumbs"></div>
+        <small id="imgnote">Duże rzuty są zmniejszane do ok. 1,2 Mpx. Jeśli wymiary są drobne, dodaj też wycinki pojedynczych pokoi.</small>
+      </div>
+
+      <div class="field">
+        <label for="name">Nazwa projektu</label>
+        <input id="name" placeholder="np. Mieszkanie Mokotów, 3 pokoje">
+      </div>
+      <div class="row2">
+        <div class="field"><label for="area">Metraż (m²)</label><input id="area" inputmode="decimal" placeholder="np. 62"></div>
+        <div class="field"><label for="height">Wys. pomieszczeń (cm)</label><input id="height" inputmode="numeric" placeholder="np. 265"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="budget">Budżet na meble (zł)</label><input id="budget" inputmode="numeric" placeholder="np. 60000"></div>
+        <div class="field"><label for="tier">Półka cenowa</label>
+          <select id="tier"><option value="ekonomiczna">Ekonomiczna</option><option value="średnia" selected>Średnia</option><option value="premium">Premium</option><option value="na wymiar / stolarz">Na wymiar / stolarz</option></select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="style">Styl i kolorystyka</label>
+        <input id="style" placeholder="np. japandi, dąb naturalny, beże, czarne dodatki">
+      </div>
+      <div class="field">
+        <label for="rooms">Pomieszczenia i wymiary</label>
+        <textarea id="rooms" rows="4" placeholder="Salon z aneksem 5,2 × 4,1 m&#10;Sypialnia 3,4 × 3,2 m&#10;Łazienka 2,1 × 1,8 m"></textarea>
+        <small>Opcjonalne. Pomaga, gdy wymiary na rzucie są nieczytelne.</small>
+      </div>
+      <div class="field">
+        <span class="label" id="inc-l">Co rozpisać</span>
+        <div class="checks" role="group" aria-labelledby="inc-l" id="include">
+          <label class="chk"><input type="checkbox" value="meble wolnostojące" checked>Meble wolnostojące</label>
+          <label class="chk"><input type="checkbox" value="zabudowy i meble na wymiar" checked>Zabudowy na wymiar</label>
+          <label class="chk"><input type="checkbox" value="AGD" checked>AGD</label>
+          <label class="chk"><input type="checkbox" value="oświetlenie" checked>Oświetlenie</label>
+          <label class="chk"><input type="checkbox" value="ceramika i armatura łazienkowa">Łazienka (ceramika)</label>
+          <label class="chk"><input type="checkbox" value="tekstylia i dekoracje (dywany, zasłony)">Tekstylia i dekoracje</label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="notes">Dodatkowe uwagi</label>
+        <textarea id="notes" rows="3" placeholder="np. sofa rozkładana, łóżko 160×200 z pojemnikiem, mam już stół — nie liczyć"></textarea>
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="go" type="button">Rozpisz meble</button>
+        <button class="btn ghost" id="stop" type="button" hidden>Zatrzymaj</button>
+      </div>
+      <div class="status" id="status" role="status" aria-live="polite"></div>
+    </section>
+
+    <!-- RESULTS -->
+    <section class="sheet" aria-labelledby="out-h" id="out">
+      <div class="sec-h"><h2 id="out-h">Zestawienie mebli</h2><span class="label" id="proj-l">Arkusz B</span></div>
+      <div class="banner" id="exbanner" hidden><b>Przykład.</b><span>To przykładowe zestawienie, żeby pokazać format. Wrzuć swój rzut i kliknij „Rozpisz meble”, a zastąpi je Twoja lista.</span></div>
+      <p class="summary" id="summary"></p>
+      <div class="tiles" id="tiles"></div>
+      <div class="roomnav" id="roomnav" aria-label="Filtr pomieszczeń"></div>
+      <div class="legend">Źródło:
+        <span class="src plan">plan</span> odczytane z rzutu
+        <span class="src wiz">wiz</span> z wizualizacji
+        <span class="src oba">oba</span> rzut i wizualizacja
+        <span class="src sug">sug</span> sugestia Claude
+        · Kliknij komórkę, aby edytować.
+      </div>
+      <div id="rooms-out" style="display:flex;flex-direction:column;gap:14px"></div>
+      <div class="qs" id="qs" hidden><span class="label">Do doprecyzowania</span><ul id="qlist"></ul></div>
+
+      <div class="actions">
+        <button class="btn sm" id="csv" type="button">Pobierz CSV (Excel)</button>
+        <button class="btn sm" id="copy" type="button">Kopiuj jako tekst</button>
+        <button class="btn sm ghost" id="clear" type="button">Wyczyść listę</button>
+        <button class="btn sm" id="clear-yes" type="button" hidden>Tak, wyczyść</button>
+      </div>
+      <textarea class="copyout" id="copyout" hidden readonly aria-label="Lista do skopiowania"></textarea>
+
+      <div class="refine">
+        <label class="label" for="ask">Popraw zestawienie</label>
+        <div class="refine-row">
+          <textarea id="ask" placeholder="np. zamień sofę na narożnik 280×180, dodaj biurko w sypialni, zmieść się w 45 000 zł"></textarea>
+          <button class="btn" id="refine" type="button">Popraw</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"></script>
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const KEY = "rozpiska-mebli-v1";
+const SRC = { plan: "plan", wizualizacja: "wiz", wiz: "wiz", oba: "oba", sugestia: "sug", sug: "sug" };
+const SRC_CYCLE = ["plan", "wizualizacja", "oba", "sugestia"];
+const IMG_KINDS = ["rzut", "wizualizacja", "inne"];
+
+const EXAMPLE = {
+  example: true,
+  summary: "Mieszkanie 2-pokojowe ok. 48 m²: salon z aneksem kuchennym, sypialnia, łazienka i przedpokój. Styl jasny skandynawski, dąb i biel.",
+  items: [
+    { room: "Salon", name: "Sofa 3-osobowa rozkładana", category: "Siedziska", qty: 1, w: 230, d: 95, h: 85, material: "tkanina boucle", color: "beż", price: 4200, source: "oba", notes: "Funkcja spania 140×200" },
+    { room: "Salon", name: "Stolik kawowy okrągły", category: "Stoły", qty: 1, w: 80, d: 80, h: 40, material: "fornir dębowy", color: "dąb naturalny", price: 900, source: "wizualizacja", notes: "" },
+    { room: "Salon", name: "Szafka RTV wisząca", category: "Zabudowa", qty: 1, w: 200, d: 40, h: 45, material: "MDF lakierowany", color: "biały mat", price: 1800, source: "plan", notes: "Pod TV 65\"" },
+    { room: "Aneks kuchenny", name: "Zabudowa kuchenna L", category: "Zabudowa na wymiar", qty: 1, w: 320, d: 60, h: 240, material: "płyta MDF + blat kompakt", color: "biel / dąb", price: 21000, source: "oba", notes: "Szafki do sufitu" },
+    { room: "Aneks kuchenny", name: "Stół z 4 krzesłami", category: "Stoły", qty: 1, w: 140, d: 80, h: 75, material: "dąb lity", color: "dąb naturalny", price: 3200, source: "plan", notes: "" },
+    { room: "Sypialnia", name: "Łóżko z pojemnikiem", category: "Łóżka", qty: 1, w: 176, d: 214, h: 100, material: "tapicerowane", color: "szałwia", price: 3500, source: "plan", notes: "Materac 160×200 osobno" },
+    { room: "Sypialnia", name: "Szafa przesuwna", category: "Zabudowa na wymiar", qty: 1, w: 240, d: 65, h: 260, material: "płyta + lustro", color: "biel", price: 6500, source: "plan", notes: "" },
+    { room: "Sypialnia", name: "Szafka nocna", category: "Przechowywanie", qty: 2, w: 45, d: 40, h: 50, material: "fornir dębowy", color: "dąb", price: 450, source: "sugestia", notes: "" },
+  ],
+  questions: ["Czy szafa w przedpokoju ma być na wymiar, czy gotowa?"]
+};
+
+let state = load() || { form: {}, list: structuredClone(EXAMPLE) };
+let images = []; // {id, blob, url, kind, name}
+let filter = "Wszystkie";
+let sample = null, downloads = null, imgLimits = null, ctl = null;
+
+/* ---------- persistence (per-viewer convenience) ---------- */
+function load() { try { return JSON.parse(localStorage.getItem(KEY)); } catch { return null; } }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch {} }
+
+/* ---------- form ---------- */
+const FIELDS = ["name", "area", "height", "budget", "tier", "style", "rooms", "notes"];
+function readForm() {
+  const f = {};
+  FIELDS.forEach(k => f[k] = $(k).value.trim());
+  f.include = [...$("include").querySelectorAll("input:checked")].map(i => i.value);
+  return f;
+}
+function fillForm(f) {
+  FIELDS.forEach(k => { if (f[k] != null && f[k] !== "") $(k).value = f[k]; });
+  if (Array.isArray(f.include)) $("include").querySelectorAll("input").forEach(i => i.checked = f.include.includes(i.value));
+}
+fillForm(state.form || {});
+document.querySelectorAll("#in-h ~ * input, #in-h ~ * textarea, #in-h ~ * select, .sheet input, .sheet select, .sheet textarea").forEach(el => {
+  if (el.closest("#out")) return;
+  el.addEventListener("change", () => { state.form = readForm(); save(); });
+});
+
+/* ---------- images ---------- */
+const drop = $("drop"), fileIn = $("file");
+drop.addEventListener("click", () => fileIn.click());
+drop.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileIn.click(); } });
+fileIn.addEventListener("change", () => { addFiles(fileIn.files); fileIn.value = ""; });
+["dragenter", "dragover"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add("over"); }));
+["dragleave", "drop"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove("over"); }));
+drop.addEventListener("drop", e => addFiles(e.dataTransfer.files));
+document.addEventListener("paste", e => {
+  const files = [...(e.clipboardData?.files || [])].filter(f => f.type.startsWith("image/"));
+  if (files.length) addFiles(files);
+});
+
+async function addFiles(list) {
+  for (const f of [...list]) {
+    try {
+      if (f.type === "application/pdf" || /\.pdf$/i.test(f.name)) await addPdf(f);
+      else if (/^image\/(jpeg|png|webp|gif)$/.test(f.type)) pushImage(f, f.name);
+      else setStatus(`Pominięto „${f.name}” — obsługiwane są JPG, PNG, WebP i PDF.`, true);
+    } catch (err) { setStatus(`Nie udało się wczytać „${f.name}”.`, true); }
+  }
+  renderThumbs();
+}
+function guessKind(name) {
+  const n = name.toLowerCase();
+  if (/rzut|plan|layout|uk[lł]ad/.test(n)) return "rzut";
+  if (/wiz|render|vis|view/.test(n)) return "wizualizacja";
+  return images.some(i => i.kind === "rzut") ? "wizualizacja" : "rzut";
+}
+function pushImage(blob, name) {
+  images.push({ id: Math.random().toString(36).slice(2), blob, url: URL.createObjectURL(blob), kind: guessKind(name), name });
+}
+async function addPdf(file) {
+  if (!window.pdfjsLib) throw new Error("pdf.js");
+  setStatus(`Wczytuję PDF „${file.name}”…`);
+  const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+  const pages = Math.min(pdf.numPages, 12);
+  for (let p = 1; p <= pages; p++) {
+    const page = await pdf.getPage(p);
+    const base = page.getViewport({ scale: 1 });
+    const scale = Math.min(3, 2400 / Math.max(base.width, base.height));
+    const vp = page.getViewport({ scale });
+    const c = document.createElement("canvas");
+    c.width = Math.round(vp.width); c.height = Math.round(vp.height);
+    const ctx = c.getContext("2d");
+    ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);
+    await page.render({ canvasContext: ctx, viewport: vp }).promise;
+    const blob = await new Promise(r => c.toBlob(r, "image/png"));
+    pushImage(blob, `${file.name} s.${p}`);
+  }
+  setStatus(pdf.numPages > 12 ? "Wczytano pierwsze 12 stron PDF." : "");
+}
+function renderThumbs() {
+  const box = $("thumbs"); box.textContent = "";
+  images.forEach((im, idx) => {
+    const d = document.createElement("div"); d.className = "thumb";
+    const img = document.createElement("img"); img.src = im.url; img.alt = im.name;
+    const sel = document.createElement("select"); sel.id = "kind-" + im.id; sel.setAttribute("aria-label", "Rodzaj: " + im.name);
+    IMG_KINDS.forEach(k => { const o = document.createElement("option"); o.value = k; o.textContent = k; if (k === im.kind) o.selected = true; sel.append(o); });
+    sel.onchange = () => im.kind = sel.value;
+    const x = document.createElement("button"); x.type = "button"; x.textContent = "×"; x.setAttribute("aria-label", "Usuń " + im.name);
+    x.onclick = () => { URL.revokeObjectURL(im.url); images.splice(idx, 1); renderThumbs(); };
+    d.append(img, sel, x); box.append(d);
+  });
+  const max = imgLimits?.maxCount;
+  if (max && images.length > max) setStatus(`Claude przyjmie naraz ${max} obrazów — zostanie użytych pierwszych ${max}. Usuń mniej ważne.`, true);
+}
+
+/* ---------- Claude ---------- */
+(async () => {
+  try { sample = await window.claude?.use?.("sample"); } catch {}
+  try { downloads = await window.claude?.use?.("downloads"); } catch {}
+  if (sample) { try { imgLimits = (await sample.limits())?.images || null; } catch {} }
+  if (!sample) { $("go").disabled = true; $("refine").disabled = true; setStatus("Analiza przez Claude działa po otwarciu tej strony w claude.ai."); }
+  else if (!imgLimits) setStatus("Ten widok nie może wysyłać obrazów — rozpiska powstanie tylko z danych tekstowych.");
+  if (!downloads) $("csv").hidden = true;
+})();
+
+const SCHEMA = `Odpowiedz WYŁĄCZNIE jednym obiektem JSON o kształcie:
+{
+  "summary": "2-3 zdania: co widać na rzucie (układ, pomieszczenia, metraż) i ogólny styl",
+  "items": [
+    {"room": "nazwa pomieszczenia", "name": "konkretna nazwa mebla", "category": "np. Siedziska / Stoły / Łóżka / Przechowywanie / Zabudowa na wymiar / AGD / Oświetlenie / Łazienka / Tekstylia / Dekoracje",
+     "qty": 1, "w": szerokość_cm, "d": głębokość_cm, "h": wysokość_cm, "material": "materiał", "color": "kolor/wykończenie",
+     "price": cena_jednostkowa_PLN_liczba, "source": "plan" | "wizualizacja" | "oba" | "sugestia", "notes": "krótka uwaga: jak odczytano wymiar, funkcja, na co uważać"}
+  ],
+  "questions": ["krótkie pytania o rzeczy, których nie da się odczytać"]
+}
+Wymiary w cm jako liczby całkowite (null, jeśli zupełnie nieznane). Ceny jednostkowe w złotych jako liczby, realistyczne dla polskiego rynku w 2026 r. dla podanej półki cenowej.`;
+
+function dataBlock(f) {
+  const lines = [];
+  if (f.name) lines.push(`Projekt: ${f.name}`);
+  if (f.area) lines.push(`Metraż: ${f.area} m²`);
+  if (f.height) lines.push(`Wysokość pomieszczeń: ${f.height} cm`);
+  if (f.budget) lines.push(`Budżet na meble: ${f.budget} zł`);
+  if (f.tier) lines.push(`Półka cenowa: ${f.tier}`);
+  if (f.style) lines.push(`Styl i kolory: ${f.style}`);
+  if (f.rooms) lines.push(`Pomieszczenia i wymiary od użytkownika:\n${f.rooms}`);
+  if (f.include?.length) lines.push(`Zakres do rozpisania: ${f.include.join(", ")}`);
+  if (f.notes) lines.push(`Uwagi użytkownika: ${f.notes}`);
+  return lines.join("\n") || "(brak dodatkowych danych)";
+}
+function imageBlock(imgs) {
+  if (!imgs.length) return "Brak obrazów — oprzyj się na danych tekstowych i zaproponuj umeblowanie (source: \"sugestia\").";
+  return "Załączone obrazy, w tej kolejności:\n" + imgs.map((im, i) => `${i + 1}. ${im.kind} (${im.name})`).join("\n");
+}
+function usableImages() { return imgLimits ? images.slice(0, imgLimits.maxCount || images.length) : []; }
+
+function firstPrompt(f, imgs) {
+  return `Jesteś doświadczonym projektantem wnętrz i kosztorysantem. Twoje zadanie: na podstawie rzutu mieszkania z meblami oraz wizualizacji sporządzić kompletne ZESTAWIENIE MEBLI (rozpiskę) po polsku.
+
+Jak pracować:
+- Z rzutu odczytaj pomieszczenia, ich wymiary (opisy, kotowanie, skalę) i każdy narysowany mebel. Wymiary mebli mierz względem znanych wymiarów pomieszczeń, drzwi (zwykle 80–90 cm) lub skali.
+- Z wizualizacji odczytaj rodzaj mebli, materiały, kolory, oświetlenie i dodatki. Łącz informacje z obu źródeł dla tego samego mebla (source "oba").
+- Rozpisz każdy mebel osobno, w obrębie pomieszczenia; identyczne sztuki łącz przez "qty".
+- Uwzględnij tylko zakres wskazany przez użytkownika. Nie licz rzeczy, które użytkownik już ma.
+- Jeśli czegoś brakuje do funkcjonalnego wnętrza, możesz dodać pozycję z source "sugestia".
+- Jeśli podano budżet, dobierz ceny tak, aby suma była realna, a w summary napisz, czy się mieścisz.
+
+${imageBlock(imgs)}
+
+Dane od użytkownika:
+${dataBlock(f)}
+
+${SCHEMA}`;
+}
+function refinePrompt(f, imgs, list, ask) {
+  const slim = { summary: list.summary, items: list.items, questions: list.questions };
+  return `Jesteś projektantem wnętrz i kosztorysantem. Poniżej jest aktualne zestawienie mebli (JSON) przygotowane dla mieszkania. Wprowadź zmiany, o które prosi użytkownik, a resztę pozycji zostaw bez zmian (również ręczne poprawki użytkownika).
+
+${imageBlock(imgs)}
+
+Dane od użytkownika:
+${dataBlock(f)}
+
+Aktualne zestawienie:
+${JSON.stringify(slim)}
+
+Prośba użytkownika:
+${ask}
+
+${SCHEMA}`;
+}
+
+function normalize(res) {
+  if (!res || !Array.isArray(res.items)) throw { code: "invalid_json" };
+  const num = v => { const n = typeof v === "number" ? v : parseFloat(String(v ?? "").replace(/\s/g, "").replace(",", ".")); return isFinite(n) ? n : null; };
+  return {
+    example: false,
+    summary: String(res.summary || ""),
+    items: res.items.map(it => ({
+      room: String(it.room || "Inne").trim(), name: String(it.name || "").trim(), category: String(it.category || ""),
+      qty: Math.max(1, Math.round(num(it.qty) || 1)), w: num(it.w), d: num(it.d), h: num(it.h),
+      material: String(it.material || ""), color: String(it.color || ""), price: num(it.price),
+      source: SRC_CYCLE.includes(it.source) ? it.source : (it.source === "wiz" ? "wizualizacja" : "sugestia"), notes: String(it.notes || "")
+    })).filter(it => it.name),
+    questions: Array.isArray(res.questions) ? res.questions.map(String).filter(Boolean) : []
+  };
+}
+
+const ERR = {
+  not_granted: "Nie zezwolono na użycie Claude na tej stronie. Możesz to zmienić w uprawnieniach artefaktu.",
+  rate_limited: "Za dużo zapytań naraz. Odczekaj chwilę i spróbuj ponownie.",
+  invalid_json: "Claude zwrócił odpowiedź w nieoczekiwanym formacie. Spróbuj ponownie lub ogranicz zakres.",
+  images_unavailable: "Ten widok nie może wysyłać obrazów. Otwórz stronę w claude.ai w przeglądarce.",
+  image_rejected: "Jeden z obrazów został odrzucony (format lub rozmiar). Usuń go i spróbuj ponownie.",
+  prompt_too_large: "Za dużo danych naraz. Skróć uwagi lub podziel mieszkanie na części.",
+};
+
+async function run(prompt, imgs, label) {
+  if (!sample) return;
+  ctl = new AbortController();
+  busy(true, label);
+  const started = Date.now();
+  const tick = setInterval(() => setStatus(`<span class="spinner"></span> ${label}… ${Math.round((Date.now() - started) / 1000)} s (analiza obrazów trwa zwykle 30–120 s)`, false, true), 1000);
+  try {
+    const opts = { signal: ctl.signal, modelTier: "complex" };
+    if (imgs.length) opts.images = imgs.map(i => i.blob);
+    const res = await sample.json(prompt, opts);
+    state.list = normalize(res);
+    state.form = readForm();
+    filter = "Wszystkie";
+    save(); render();
+    setStatus(`Gotowe: ${state.list.items.length} pozycji.`);
+  } catch (e) {
+    if (e?.code === "cancelled") setStatus("Zatrzymano.");
+    else setStatus(ERR[e?.code] || `Coś poszło nie tak (${e?.code || "błąd"}). Spróbuj ponownie.`, true);
+  } finally { clearInterval(tick); busy(false); }
+}
+function busy(on) {
+  $("go").disabled = on || !sample; $("refine").disabled = on || !sample; $("stop").hidden = !on;
+}
+$("stop").onclick = () => ctl?.abort();
+$("go").onclick = () => {
+  const f = readForm(), imgs = usableImages();
+  if (!imgs.length && !f.rooms && !f.area) { setStatus("Dodaj rzut mieszkania albo wpisz pomieszczenia z wymiarami.", true); return; }
+  run(firstPrompt(f, imgs), imgs, "Czytam rzut i wizualizacje");
+};
+$("refine").onclick = () => {
+  const ask = $("ask").value.trim();
+  if (!ask) { $("ask").focus(); return; }
+  const imgs = usableImages();
+  run(refinePrompt(readForm(), imgs, state.list, ask), imgs, "Poprawiam zestawienie").then(() => { if (!$("status").classList.contains("err")) $("ask").value = ""; });
+};
+
+/* ---------- render ---------- */
+const zl = n => n == null ? "—" : new Intl.NumberFormat("pl-PL", { maximumFractionDigits: 0 }).format(n) + " zł";
+const lineTotal = it => (it.price || 0) * (it.qty || 1);
+function rooms() { const r = []; state.list.items.forEach(it => { if (!r.includes(it.room)) r.push(it.room); }); return r; }
+
+function render() {
+  const L = state.list;
+  $("exbanner").hidden = !L.example;
+  $("summary").textContent = L.summary || "";
+  $("summary").hidden = !L.summary;
+  $("proj-l").textContent = state.form?.name ? state.form.name : "Arkusz B";
+
+  // tiles
+  const total = L.items.reduce((s, it) => s + lineTotal(it), 0);
+  const pcs = L.items.reduce((s, it) => s + (it.qty || 1), 0);
+  const budget = parseFloat(String(state.form?.budget || "").replace(/\s/g, "").replace(",", "."));
+  const tiles = $("tiles"); tiles.textContent = "";
+  const tile = (v, s, over) => { const d = document.createElement("div"); d.className = "tile"; d.innerHTML = `<span class="v${over ? " over" : ""}"></span><span class="s"></span>`; d.children[0].textContent = v; d.children[1].textContent = s; tiles.append(d); };
+  tile(zl(total), "Szacunkowy koszt");
+  if (isFinite(budget) && budget > 0) tile((budget - total >= 0 ? "+" : "−") + zl(Math.abs(budget - total)), budget - total >= 0 ? "Zapas w budżecie" : "Ponad budżet", budget - total < 0);
+  tile(String(pcs), `sztuk w ${L.items.length} pozycjach`);
+  tile(String(rooms().length), "pomieszczeń");
+
+  // room filter
+  const nav = $("roomnav"); nav.textContent = "";
+  const rs = rooms();
+  if (!rs.includes(filter) && filter !== "Wszystkie") filter = "Wszystkie";
+  ["Wszystkie", ...rs].forEach(r => {
+    const b = document.createElement("button"); b.type = "button";
+    const cnt = r === "Wszystkie" ? L.items.length : L.items.filter(i => i.room === r).length;
+    b.textContent = `${r} · ${cnt}`; b.setAttribute("aria-pressed", String(r === filter));
+    b.onclick = () => { filter = r; render(); };
+    nav.append(b);
+  });
+
+  // tables
+  const out = $("rooms-out"); out.textContent = "";
+  if (!L.items.length) { out.innerHTML = `<div class="empty">Lista jest pusta. Wrzuć rzut i kliknij „Rozpisz meble” albo dodaj pozycję ręcznie.</div>`; }
+  (filter === "Wszystkie" ? rs : [filter]).forEach(r => out.append(roomTable(r)));
+  if (!L.items.length) {
+    const add = document.createElement("button"); add.className = "btn sm addrow"; add.type = "button"; add.textContent = "+ Dodaj pozycję";
+    add.onclick = () => addItem("Salon"); out.append(add);
+  }
+
+  // questions
+  $("qs").hidden = !L.questions?.length;
+  const ql = $("qlist"); ql.textContent = "";
+  (L.questions || []).forEach(q => { const li = document.createElement("li"); li.textContent = q; ql.append(li); });
+}
+
+const COLS = [
+  ["name", "Mebel", "txt"], ["category", "Kategoria", "txt"], ["qty", "Szt.", "num"], ["dims", "Wymiary S×G×W (cm)", "dim"],
+  ["material", "Materiał", "txt"], ["color", "Kolor", "txt"], ["price", "Cena/szt.", "num"], ["total", "Razem", "num"],
+  ["source", "Źródło", ""], ["notes", "Uwagi", "txt"], ["del", "", ""]
+];
+function roomTable(room) {
+  const items = state.list.items.map((it, i) => [it, i]).filter(([it]) => it.room === room);
+  const sec = document.createElement("div"); sec.className = "room";
+  const sum = items.reduce((s, [it]) => s + lineTotal(it), 0);
+  const h = document.createElement("div"); h.className = "room-h";
+  const h3 = document.createElement("h3"); h3.textContent = room; h3.contentEditable = "true"; h3.spellcheck = false; h3.title = "Kliknij, aby zmienić nazwę pomieszczenia";
+  h3.addEventListener("blur", () => { const v = h3.textContent.trim(); if (v && v !== room) { state.list.items.forEach(it => { if (it.room === room) it.room = v; }); if (filter === room) filter = v; commit(); } });
+  h3.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); h3.blur(); } });
+  const s = document.createElement("span"); s.className = "sum"; s.textContent = zl(sum);
+  h.append(h3, s);
+
+  const wrap = document.createElement("div"); wrap.className = "tablewrap";
+  const t = document.createElement("table");
+  const thead = document.createElement("thead"); const hr = document.createElement("tr");
+  COLS.forEach(([k, label, kind]) => { const th = document.createElement("th"); th.textContent = label; if (kind === "num") th.className = "num"; hr.append(th); });
+  thead.append(hr); t.append(thead);
+  const tb = document.createElement("tbody");
+  items.forEach(([it, idx]) => tb.append(rowEl(it, idx)));
+  t.append(tb); wrap.append(t);
+
+  const add = document.createElement("button"); add.className = "btn sm addrow"; add.type = "button"; add.textContent = "+ Dodaj pozycję";
+  add.onclick = () => addItem(room);
+  sec.append(h, wrap, add);
+  return sec;
+}
+function editable(text, onSave, numeric) {
+  const el = document.createElement(numeric === "inline" ? "span" : "div");
+  el.contentEditable = "true"; el.spellcheck = false; el.textContent = text ?? "";
+  el.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); el.blur(); } if (e.key === "Escape") { el.textContent = text ?? ""; el.blur(); } });
+  el.addEventListener("blur", () => { const v = el.textContent.trim(); if (v !== String(text ?? "")) onSave(v); });
+  return el;
+}
+const toNum = v => { if (v === "" || v === "—") return null; const n = parseFloat(v.replace(/\s|zł/g, "").replace(",", ".")); return isFinite(n) ? n : null; };
+function rowEl(it, idx) {
+  const tr = document.createElement("tr");
+  COLS.forEach(([k, , kind]) => {
+    const td = document.createElement("td"); if (kind) td.className = kind;
+    if (k === "dims") {
+      ["w", "d", "h"].forEach((dk, j) => {
+        if (j) { const x = document.createElement("span"); x.className = "x"; x.textContent = "×"; td.append(x); }
+        const e = editable(it[dk] ?? "", v => { it[dk] = toNum(v); commit(); }, "inline"); e.setAttribute("aria-label", { w: "szerokość", d: "głębokość", h: "wysokość" }[dk]); td.append(e);
+      });
+    } else if (k === "total") {
+      td.textContent = zl(lineTotal(it)); td.style.padding = "5px 8px"; td.style.fontFamily = "var(--f-mono)"; td.style.whiteSpace = "nowrap";
+    } else if (k === "price" || k === "qty") {
+      td.append(editable(it[k] == null ? "" : String(it[k]), v => { const n = toNum(v); it[k] = k === "qty" ? Math.max(1, Math.round(n || 1)) : n; commit(); }));
+    } else if (k === "source") {
+      const b = document.createElement("button"); b.type = "button"; b.className = "src " + SRC[it.source]; b.textContent = SRC[it.source];
+      b.title = "Kliknij, aby zmienić źródło"; b.onclick = () => { it.source = SRC_CYCLE[(SRC_CYCLE.indexOf(it.source) + 1) % SRC_CYCLE.length]; commit(); };
+      td.append(b); td.style.padding = "4px 8px";
+    } else if (k === "del") {
+      const b = document.createElement("button"); b.type = "button"; b.className = "del"; b.textContent = "×"; b.setAttribute("aria-label", "Usuń " + it.name);
+      b.onclick = () => { state.list.items.splice(idx, 1); commit(); }; td.append(b);
+    } else {
+      const e = editable(it[k], v => { it[k] = v; commit(); }); if (k === "name") e.style.fontWeight = "600"; td.append(e);
+    }
+    tr.append(td);
+  });
+  return tr;
+}
+function addItem(room) {
+  state.list.items.push({ room, name: "Nowa pozycja", category: "", qty: 1, w: null, d: null, h: null, material: "", color: "", price: null, source: "sugestia", notes: "" });
+  commit();
+}
+function commit() { if (state.list.example) state.list.example = false; save(); render(); }
+
+/* ---------- export ---------- */
+function rowsForExport() {
+  const head = ["Pomieszczenie", "Mebel", "Kategoria", "Ilość", "Szerokość cm", "Głębokość cm", "Wysokość cm", "Materiał", "Kolor", "Cena/szt. zł", "Razem zł", "Źródło", "Uwagi"];
+  const rows = state.list.items.map(it => [it.room, it.name, it.category, it.qty, it.w ?? "", it.d ?? "", it.h ?? "", it.material, it.color, it.price ?? "", lineTotal(it) || "", it.source, it.notes]);
+  return [head, ...rows];
+}
+$("csv").onclick = async () => {
+  const esc = v => { const s = String(v ?? ""); return /[;"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const csv = "﻿" + rowsForExport().map(r => r.map(esc).join(";")).join("\r\n");
+  const base = (state.form?.name || "zestawienie-mebli").toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]+/gi, "-").replace(/^-|-$/g, "") || "zestawienie-mebli";
+  try { const r = await downloads.save({ filename: base + ".csv", data: csv }); if (r?.status === "saved") toast("Zapisano CSV"); }
+  catch (e) { if (e?.code === "unavailable") $("csv").hidden = true; }
+};
+$("copy").onclick = async () => {
+  const lines = [];
+  rooms().forEach(r => {
+    lines.push(`\n${r.toUpperCase()}`);
+    state.list.items.filter(i => i.room === r).forEach(it => {
+      const dims = [it.w, it.d, it.h].some(v => v != null) ? ` — ${[it.w, it.d, it.h].map(v => v ?? "?").join("×")} cm` : "";
+      const mat = [it.material, it.color].filter(Boolean).join(", ");
+      lines.push(`• ${it.qty > 1 ? it.qty + "× " : ""}${it.name}${dims}${mat ? " (" + mat + ")" : ""} — ${zl(lineTotal(it))}`);
+    });
+  });
+  lines.push(`\nRAZEM: ${zl(state.list.items.reduce((s, it) => s + lineTotal(it), 0))}`);
+  const text = lines.join("\n").trim();
+  try { await navigator.clipboard.writeText(text); toast("Skopiowano"); }
+  catch { const ta = $("copyout"); ta.hidden = false; ta.value = text; ta.focus(); ta.select(); toast("Zaznaczono tekst — skopiuj Ctrl+C"); }
+};
+$("clear").onclick = () => { $("clear-yes").hidden = false; $("clear").textContent = "Anuluj"; $("clear").onclick = resetClear; };
+function resetClear() { $("clear-yes").hidden = true; $("clear").textContent = "Wyczyść listę"; $("clear").onclick = () => { $("clear-yes").hidden = false; $("clear").textContent = "Anuluj"; $("clear").onclick = resetClear; }; }
+$("clear-yes").onclick = () => { state.list = { example: false, summary: "", items: [], questions: [] }; save(); render(); resetClear(); };
+
+/* ---------- ui helpers ---------- */
+function setStatus(msg, err, html) { const s = $("status"); s.classList.toggle("err", !!err); if (html) s.innerHTML = msg; else s.textContent = msg; }
+let tt; function toast(m) { const t = $("toast"); t.textContent = m; t.hidden = false; clearTimeout(tt); tt = setTimeout(() => t.hidden = true, 2200); }
+
+render();
+})();
+</script>
