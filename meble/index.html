@@ -50,7 +50,10 @@ header p { margin: 4px 0 0; color: var(--muted); max-width: 60ch }
 .sec-h h2 { font-size: 17px; font-weight: 700 }
 
 .drop { border: 1.5px dashed var(--line); border-radius: var(--r); padding: 18px; text-align: center; cursor: pointer; transition: border-color .15s, background .15s }
-.drop:hover, .drop.over, .drop:focus-visible { border-color: var(--accent); background: var(--accent-soft); outline: none }
+.drop { display: flex; flex-direction: column; align-items: center; gap: 4px; position: relative }
+.drop:hover, .drop.over, .drop:focus-within { border-color: var(--accent); background: var(--accent-soft); outline: none }
+.drop .pick { margin-top: 6px; pointer-events: none; color: var(--fg) }
+.vh { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; clip: rect(0 0 0 0); border: 0; padding: 0 }
 .drop strong { display: block; font-size: 14px }
 .drop span { color: var(--muted); font-size: 12px }
 .thumbs { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px }
@@ -149,11 +152,12 @@ td .del:hover { color: var(--bad); background: var(--bg) }
 
       <div class="field">
         <label for="file">Rzuty i wizualizacje</label>
-        <div class="drop" id="drop" tabindex="0" role="button" aria-describedby="drop-hint">
+        <label class="drop" id="drop" for="file">
+          <input type="file" id="file" class="vh" multiple accept="image/*,application/pdf,.pdf">
           <strong>Upuść pliki lub kliknij, aby wybrać</strong>
           <span id="drop-hint">JPG, PNG, WebP, PDF (każda strona osobno) · możesz też wkleić Ctrl+V</span>
-        </div>
-        <input type="file" id="file" multiple accept="image/jpeg,image/png,image/webp,image/gif,application/pdf" hidden>
+          <span class="btn sm pick">Wybierz pliki</span>
+        </label>
         <div class="thumbs" id="thumbs"></div>
         <small id="imgnote">Duże rzuty są zmniejszane do ok. 1,2 Mpx. Jeśli wymiary są drobne, dodaj też wycinki pojedynczych pokoi.</small>
       </div>
@@ -296,8 +300,6 @@ document.querySelectorAll("#in-h ~ * input, #in-h ~ * textarea, #in-h ~ * select
 
 /* ---------- images ---------- */
 const drop = $("drop"), fileIn = $("file");
-drop.addEventListener("click", () => fileIn.click());
-drop.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileIn.click(); } });
 fileIn.addEventListener("change", () => { addFiles(fileIn.files); fileIn.value = ""; });
 ["dragenter", "dragover"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.add("over"); }));
 ["dragleave", "drop"].forEach(t => drop.addEventListener(t, e => { e.preventDefault(); drop.classList.remove("over"); }));
@@ -312,10 +314,18 @@ async function addFiles(list) {
     try {
       if (f.type === "application/pdf" || /\.pdf$/i.test(f.name)) await addPdf(f);
       else if (/^image\/(jpeg|png|webp|gif)$/.test(f.type)) pushImage(f, f.name);
+      else if (f.type.startsWith("image/")) pushImage(await toPng(f), f.name);
       else setStatus(`Pominięto „${f.name}” — obsługiwane są JPG, PNG, WebP i PDF.`, true);
     } catch (err) { setStatus(`Nie udało się wczytać „${f.name}”.`, true); }
   }
   renderThumbs();
+  if (images.length && !$("status").classList.contains("err")) setStatus(`Dodano plików: ${images.length}.`);
+}
+async function toPng(file) {
+  const bmp = await createImageBitmap(file);
+  const c = document.createElement("canvas"); c.width = bmp.width; c.height = bmp.height;
+  c.getContext("2d").drawImage(bmp, 0, 0);
+  return new Promise(r => c.toBlob(r, "image/png"));
 }
 function guessKind(name) {
   const n = name.toLowerCase();
