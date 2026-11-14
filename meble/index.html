@@ -134,6 +134,22 @@ td .del:hover { color: var(--bad); background: var(--bg) }
 .empty { color: var(--muted); padding: 30px 10px; text-align: center }
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); background: var(--fg); color: var(--sheet); padding: 8px 14px; border-radius: 4px; font-size: 13px; z-index: 20 }
 .copyout { width: 100%; min-height: 160px; font: 12px var(--f-mono) }
+
+/* Rozkrój */
+.cutgrid { display: grid; grid-template-columns: minmax(260px, 340px) minmax(0, 1fr); gap: 20px; align-items: start }
+@media (max-width: 900px) { .cutgrid { grid-template-columns: minmax(0, 1fr) } }
+.cutparams, .cutout { display: flex; flex-direction: column; gap: 12px; min-width: 0 }
+.row3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px }
+.subh { font-size: 15px; font-weight: 700; padding-top: 6px }
+table.narrow { min-width: 560px }
+table.panels { min-width: 1080px }
+tr.grp td { background: var(--bg); font: 500 11px var(--f-mono); text-transform: uppercase; letter-spacing: .07em; color: var(--muted); padding: 6px 8px }
+tr.over td:first-child { box-shadow: inset 3px 0 0 var(--bad) }
+td.lp { font-family: var(--f-mono); color: var(--muted); padding: 5px 8px; text-align: right; white-space: nowrap }
+.edges { display: inline-flex; gap: 2px }
+.tog { font: 500 10px var(--f-mono); min-width: 26px; height: 22px; border: 1px solid var(--line); background: transparent; color: var(--muted); border-radius: 3px; cursor: pointer; padding: 0 3px }
+.tog[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-ink) }
+.tog:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px }
 </style>
 
 <div class="wrap">
@@ -142,7 +158,7 @@ td .del:hover { color: var(--bad); background: var(--bg) }
       <h1>Rozpiska Mebli</h1>
       <p>Wrzuć rzut mieszkania z meblami i wizualizacje, dopisz dane. Claude odczyta pomieszczenia i rozpisze każdy mebel z wymiarami, materiałem, ilością i szacunkową ceną.</p>
     </div>
-    <span class="stamp" id="stamp">Zestawienie · v1</span>
+    <span class="stamp" id="stamp">Zestawienie · v2</span>
   </header>
 
   <div class="grid">
@@ -228,6 +244,7 @@ td .del:hover { color: var(--bad); background: var(--bg) }
       <div class="actions">
         <button class="btn sm" id="csv" type="button">Pobierz CSV (Excel)</button>
         <button class="btn sm" id="copy" type="button">Kopiuj jako tekst</button>
+        <button class="btn sm" id="addcustom" type="button">+ Mebel na wymiar</button>
         <button class="btn sm ghost" id="clear" type="button">Wyczyść listę</button>
         <button class="btn sm" id="clear-yes" type="button" hidden>Tak, wyczyść</button>
       </div>
@@ -242,6 +259,92 @@ td .del:hover { color: var(--bad); background: var(--bg) }
       </div>
     </section>
   </div>
+
+  <!-- CUT LIST -->
+  <section class="sheet" id="cut" hidden aria-labelledby="cut-h">
+    <div class="sec-h"><h2 id="cut-h">Rozkrój na formatki</h2><div class="actions"><span class="label" id="cut-room"></span><button class="btn sm ghost" id="cut-close" type="button">Zamknij</button></div></div>
+    <div class="cutgrid">
+      <div class="cutparams">
+        <div class="field"><span class="label">Wymiary zewnętrzne (mm)</span>
+          <div class="row3">
+            <div class="field"><label for="c-w">Szerokość</label><input id="c-w" inputmode="numeric"></div>
+            <div class="field"><label for="c-d">Głębokość</label><input id="c-d" inputmode="numeric"></div>
+            <div class="field"><label for="c-h">Wysokość</label><input id="c-h" inputmode="numeric"></div>
+          </div>
+        </div>
+        <div class="field"><label for="c-board">Płyta korpusu</label><input id="c-board"></div>
+        <div class="field"><label for="c-front">Fronty (materiał)</label><input id="c-front"></div>
+        <div class="row2">
+          <div class="field"><label for="c-boardT">Gr. korpusu (mm)</label><input id="c-boardT" inputmode="numeric"></div>
+          <div class="field"><label for="c-frontT">Gr. frontów (mm)</label><input id="c-frontT" inputmode="numeric"></div>
+        </div>
+        <div class="field"><label for="c-handle">Uchwyty i frezy frontów</label>
+          <select id="c-handle">
+            <option>frezowany uchwyt krawędziowy (J / 45°)</option>
+            <option>profil Gola (bezuchwytowo)</option>
+            <option>system TIP-ON (bez uchwytów)</option>
+            <option>uchwyty nakładane / gałki</option>
+            <option>frezowana ramka (shaker)</option>
+            <option>frezy dekoracyjne V / lamele</option>
+            <option>drzwi przesuwne w systemie profili</option>
+            <option>bez frontów (regał otwarty)</option>
+          </select>
+        </div>
+        <div class="field"><label for="c-back">Plecy</label>
+          <select id="c-back">
+            <option>HDF 3 mm wpuszczany w rowek</option>
+            <option>HDF 3 mm nabijany od tyłu</option>
+            <option>płyta 18 mm (plecy nośne)</option>
+            <option>bez pleców (przy ścianie)</option>
+          </select>
+        </div>
+        <div class="field"><label for="c-edge">Obrzeże</label><input id="c-edge"></div>
+        <div class="row2">
+          <div class="field"><label for="c-plinth">Cokół (mm, 0 = brak)</label><input id="c-plinth" inputmode="numeric"></div>
+          <div class="field"><label for="c-gap">Szczelina frontów (mm)</label><input id="c-gap" inputmode="decimal"></div>
+        </div>
+        <div class="field"><label for="c-desc">Podział i wnętrze</label>
+          <textarea id="c-desc" rows="4" placeholder="np. 3 drzwi przesuwne; lewa część: drążek + półka nad nim; środek: półki co 35 cm; prawa: 4 szuflady wewnętrzne"></textarea>
+          <small>Puste = Claude zaproponuje podział sam.</small>
+        </div>
+        <div class="actions">
+          <button class="btn primary" id="c-go" type="button">Rozpisz na formatki</button>
+          <button class="btn ghost" id="c-stop" type="button" hidden>Zatrzymaj</button>
+        </div>
+        <div class="status" id="c-status" role="status" aria-live="polite"></div>
+      </div>
+
+      <div class="cutout">
+        <div class="empty" id="cut-empty">Ustaw parametry po lewej i kliknij „Rozpisz na formatki”. Dostaniesz listę formatek z wymiarami w mm, obrzeżem, kierunkiem słojów, frezami, obróbkami i okuciami, gotową do wysłania do hurtowni.</div>
+        <div id="cut-res" class="cutout" hidden>
+          <p class="summary" id="cut-construction"></p>
+          <div class="tiles" id="cut-tiles"></div>
+          <div class="status err" id="cut-warn"></div>
+          <div class="tablewrap"><table class="panels" id="cut-panels"></table></div>
+          <button class="btn sm addrow" id="cut-addp" type="button">+ Dodaj formatkę</button>
+          <h3 class="subh">Obróbki i frezowania</h3>
+          <div class="tablewrap"><table class="narrow" id="cut-ops"></table></div>
+          <button class="btn sm addrow" id="cut-addo" type="button">+ Dodaj obróbkę</button>
+          <h3 class="subh">Okucia</h3>
+          <div class="tablewrap"><table class="narrow" id="cut-hw"></table></div>
+          <button class="btn sm addrow" id="cut-addh" type="button">+ Dodaj okucie</button>
+          <div class="qs" id="cut-qs" hidden><span class="label">Do doprecyzowania</span><ul id="cut-qlist"></ul></div>
+          <div class="actions">
+            <button class="btn sm" id="cut-csv" type="button">Pobierz formatki CSV</button>
+            <button class="btn sm" id="cut-copy" type="button">Kopiuj jako tekst</button>
+          </div>
+          <div class="refine">
+            <label class="label" for="cut-ask">Popraw rozkrój</label>
+            <div class="refine-row">
+              <textarea id="cut-ask" placeholder="np. plecy nabijane zamiast w rowku, dodaj 2 półki w prawej części, fronty z frezem shaker"></textarea>
+              <button class="btn" id="cut-refine" type="button">Popraw</button>
+            </div>
+            <div class="status" id="cut-rst" role="status" aria-live="polite"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </div>
 <div class="toast" id="toast" hidden></div>
 
@@ -275,6 +378,9 @@ let state = load() || { form: {}, list: structuredClone(EXAMPLE) };
 let images = []; // {id, blob, url, kind, name}
 let filter = "Wszystkie";
 let sample = null, downloads = null, imgLimits = null, ctl = null;
+const uid = () => Math.random().toString(36).slice(2, 10);
+state.list.items.forEach(i => { if (!i.id) i.id = uid(); });
+state.cutDefaults = state.cutDefaults || {};
 
 /* ---------- persistence (per-viewer convenience) ---------- */
 function load() { try { return JSON.parse(localStorage.getItem(KEY)); } catch { return null; } }
@@ -294,7 +400,7 @@ function fillForm(f) {
 }
 fillForm(state.form || {});
 document.querySelectorAll("#in-h ~ * input, #in-h ~ * textarea, #in-h ~ * select, .sheet input, .sheet select, .sheet textarea").forEach(el => {
-  if (el.closest("#out")) return;
+  if (el.closest("#out, #cut")) return;
   el.addEventListener("change", () => { state.form = readForm(); save(); });
 });
 
@@ -432,8 +538,8 @@ ${dataBlock(f)}
 ${SCHEMA}`;
 }
 function refinePrompt(f, imgs, list, ask) {
-  const slim = { summary: list.summary, items: list.items, questions: list.questions };
-  return `Jesteś projektantem wnętrz i kosztorysantem. Poniżej jest aktualne zestawienie mebli (JSON) przygotowane dla mieszkania. Wprowadź zmiany, o które prosi użytkownik, a resztę pozycji zostaw bez zmian (również ręczne poprawki użytkownika).
+  const slim = { summary: list.summary, items: list.items.map(({ cut, cutParams, ...r }) => r), questions: list.questions };
+  return `Jesteś projektantem wnętrz i kosztorysantem. Poniżej jest aktualne zestawienie mebli (JSON) przygotowane dla mieszkania. Wprowadź zmiany, o które prosi użytkownik, a resztę pozycji zostaw bez zmian (również ręczne poprawki użytkownika). Zachowaj pole "id" istniejących pozycji; nowe pozycje mogą go nie mieć.
 
 ${imageBlock(imgs)}
 
@@ -456,6 +562,7 @@ function normalize(res) {
     example: false,
     summary: String(res.summary || ""),
     items: res.items.map(it => ({
+      id: it.id ? String(it.id) : null,
       room: String(it.room || "Inne").trim(), name: String(it.name || "").trim(), category: String(it.category || ""),
       qty: Math.max(1, Math.round(num(it.qty) || 1)), w: num(it.w), d: num(it.d), h: num(it.h),
       material: String(it.material || ""), color: String(it.color || ""), price: num(it.price),
@@ -474,40 +581,60 @@ const ERR = {
   prompt_too_large: "Za dużo danych naraz. Skróć uwagi lub podziel mieszkanie na części.",
 };
 
-async function run(prompt, imgs, label) {
-  if (!sample) return;
+async function run(prompt, imgs, label, apply, statusId = "status") {
+  if (!sample) return false;
   ctl = new AbortController();
-  busy(true, label);
+  busy(true);
+  const st = (m, e, h) => setStatus(m, e, h, statusId);
   const started = Date.now();
-  const tick = setInterval(() => setStatus(`<span class="spinner"></span> ${label}… ${Math.round((Date.now() - started) / 1000)} s (analiza obrazów trwa zwykle 30–120 s)`, false, true), 1000);
+  st(`<span class="spinner"></span> ${label}…`, false, true);
+  const tick = setInterval(() => st(`<span class="spinner"></span> ${label}… ${Math.round((Date.now() - started) / 1000)} s (zwykle 30–120 s)`, false, true), 1000);
   try {
     const opts = { signal: ctl.signal, modelTier: "complex" };
     if (imgs.length) opts.images = imgs.map(i => i.blob);
     const res = await sample.json(prompt, opts);
-    state.list = normalize(res);
-    state.form = readForm();
-    filter = "Wszystkie";
+    const msg = apply(res);
     save(); render();
-    setStatus(`Gotowe: ${state.list.items.length} pozycji.`);
+    clearInterval(tick); st(msg);
+    return true;
   } catch (e) {
-    if (e?.code === "cancelled") setStatus("Zatrzymano.");
-    else setStatus(ERR[e?.code] || `Coś poszło nie tak (${e?.code || "błąd"}). Spróbuj ponownie.`, true);
+    clearInterval(tick);
+    if (e?.code === "cancelled") st("Zatrzymano.");
+    else st(ERR[e?.code] || `Coś poszło nie tak (${e?.code || "błąd"}). Spróbuj ponownie.`, true);
+    return false;
   } finally { clearInterval(tick); busy(false); }
 }
 function busy(on) {
-  $("go").disabled = on || !sample; $("refine").disabled = on || !sample; $("stop").hidden = !on;
+  ["go", "refine", "c-go", "cut-refine"].forEach(id => $(id).disabled = on || !sample);
+  $("stop").hidden = !on; $("c-stop").hidden = !on;
 }
 $("stop").onclick = () => ctl?.abort();
+$("c-stop").onclick = () => ctl?.abort();
+function carryCuts(old, neu) {
+  neu.items.forEach(it => {
+    const m = (it.id && old.items.find(o => o.id === it.id)) || old.items.find(o => o.room === it.room && o.name === it.name);
+    if (m) { it.id = m.id; if (m.cut) it.cut = m.cut; if (m.cutParams) it.cutParams = m.cutParams; }
+    if (!it.id) it.id = uid();
+  });
+}
+function applyList(res) {
+  const old = state.list;
+  state.list = normalize(res);
+  carryCuts(old, state.list);
+  state.form = readForm();
+  filter = "Wszystkie";
+  return `Gotowe: ${state.list.items.length} pozycji.`;
+}
 $("go").onclick = () => {
   const f = readForm(), imgs = usableImages();
   if (!imgs.length && !f.rooms && !f.area) { setStatus("Dodaj rzut mieszkania albo wpisz pomieszczenia z wymiarami.", true); return; }
-  run(firstPrompt(f, imgs), imgs, "Czytam rzut i wizualizacje");
+  run(firstPrompt(f, imgs), imgs, "Czytam rzut i wizualizacje", applyList);
 };
 $("refine").onclick = () => {
   const ask = $("ask").value.trim();
   if (!ask) { $("ask").focus(); return; }
   const imgs = usableImages();
-  run(refinePrompt(readForm(), imgs, state.list, ask), imgs, "Poprawiam zestawienie").then(() => { if (!$("status").classList.contains("err")) $("ask").value = ""; });
+  run(refinePrompt(readForm(), imgs, state.list, ask), imgs, "Poprawiam zestawienie", applyList).then(ok => { if (ok) $("ask").value = ""; });
 };
 
 /* ---------- render ---------- */
@@ -558,12 +685,13 @@ function render() {
   $("qs").hidden = !L.questions?.length;
   const ql = $("qlist"); ql.textContent = "";
   (L.questions || []).forEach(q => { const li = document.createElement("li"); li.textContent = q; ql.append(li); });
+  if (cutId) renderCut();
 }
 
 const COLS = [
   ["name", "Mebel", "txt"], ["category", "Kategoria", "txt"], ["qty", "Szt.", "num"], ["dims", "Wymiary S×G×W (cm)", "dim"],
   ["material", "Materiał", "txt"], ["color", "Kolor", "txt"], ["price", "Cena/szt.", "num"], ["total", "Razem", "num"],
-  ["source", "Źródło", ""], ["notes", "Uwagi", "txt"], ["del", "", ""]
+  ["source", "Źródło", ""], ["notes", "Uwagi", "txt"], ["cut", "Rozkrój", ""], ["del", "", ""]
 ];
 function roomTable(room) {
   const items = state.list.items.map((it, i) => [it, i]).filter(([it]) => it.room === room);
@@ -615,6 +743,10 @@ function rowEl(it, idx) {
       const b = document.createElement("button"); b.type = "button"; b.className = "src " + SRC[it.source]; b.textContent = SRC[it.source];
       b.title = "Kliknij, aby zmienić źródło"; b.onclick = () => { it.source = SRC_CYCLE[(SRC_CYCLE.indexOf(it.source) + 1) % SRC_CYCLE.length]; commit(); };
       td.append(b); td.style.padding = "4px 8px";
+    } else if (k === "cut") {
+      const b = document.createElement("button"); b.type = "button"; b.className = "btn sm"; b.textContent = it.cut ? "Formatki ✓" : "Formatki";
+      b.title = "Rozpisz na formatki, fronty, frezy i okucia"; b.onclick = () => openCut(it.id);
+      td.append(b); td.style.padding = "4px 6px"; td.style.whiteSpace = "nowrap";
     } else if (k === "del") {
       const b = document.createElement("button"); b.type = "button"; b.className = "del"; b.textContent = "×"; b.setAttribute("aria-label", "Usuń " + it.name);
       b.onclick = () => { state.list.items.splice(idx, 1); commit(); }; td.append(b);
@@ -625,10 +757,17 @@ function rowEl(it, idx) {
   });
   return tr;
 }
-function addItem(room) {
-  state.list.items.push({ room, name: "Nowa pozycja", category: "", qty: 1, w: null, d: null, h: null, material: "", color: "", price: null, source: "sugestia", notes: "" });
+function addItem(room, extra) {
+  const it = Object.assign({ id: uid(), room, name: "Nowa pozycja", category: "", qty: 1, w: null, d: null, h: null, material: "", color: "", price: null, source: "sugestia", notes: "" }, extra || {});
+  state.list.items.push(it);
   commit();
+  return it;
 }
+$("addcustom").onclick = () => {
+  const room = filter !== "Wszystkie" ? filter : (rooms()[0] || "Inne");
+  const it = addItem(room, { name: "Mebel na wymiar", category: "Zabudowa na wymiar" });
+  openCut(it.id);
+};
 function commit() { if (state.list.example) state.list.example = false; save(); render(); }
 
 /* ---------- export ---------- */
@@ -664,8 +803,233 @@ function resetClear() { $("clear-yes").hidden = true; $("clear").textContent = "
 $("clear-yes").onclick = () => { state.list = { example: false, summary: "", items: [], questions: [] }; save(); render(); resetClear(); };
 
 /* ---------- ui helpers ---------- */
-function setStatus(msg, err, html) { const s = $("status"); s.classList.toggle("err", !!err); if (html) s.innerHTML = msg; else s.textContent = msg; }
+function setStatus(msg, err, html, id = "status") { const s = $(id); s.classList.toggle("err", !!err); if (html) s.innerHTML = msg; else s.textContent = msg; }
 let tt; function toast(m) { const t = $("toast"); t.textContent = m; t.hidden = false; clearTimeout(tt); tt = setTimeout(() => t.hidden = true, 2200); }
+
+/* ---------- rozkrój na formatki ---------- */
+const CUT_DEF = {
+  board: "płyta laminowana 18 mm, biała", boardT: "18", front: "MDF lakierowany 18 mm, biały mat", frontT: "18",
+  handle: "frezowany uchwyt krawędziowy (J / 45°)", back: "HDF 3 mm wpuszczany w rowek",
+  edge: "ABS 1 mm na widocznych krawędziach, 0,8 mm na pozostałych", plinth: "100", gap: "3", desc: ""
+};
+const CUT_FIELDS = ["w", "d", "h", "board", "boardT", "front", "frontT", "handle", "back", "edge", "plinth", "gap", "desc"];
+const SHARED = ["board", "boardT", "front", "frontT", "handle", "back", "edge", "plinth", "gap"];
+const SHEET = { L: 2800, W: 2070 };
+let cutId = null;
+const cutItem = () => state.list.items.find(i => i.id === cutId);
+const nv = v => { const n = typeof v === "number" ? v : parseFloat(String(v ?? "").replace(/\s/g, "").replace(",", ".")); return isFinite(n) ? n : null; };
+const fmt = (n, d = 0) => new Intl.NumberFormat("pl-PL", { minimumFractionDigits: d, maximumFractionDigits: d }).format(n);
+
+function cutParams(it) {
+  const p = Object.assign({}, CUT_DEF, state.cutDefaults, it.cutParams || {});
+  ["w", "d", "h"].forEach(k => { if (p[k] == null || p[k] === "") p[k] = it[k] != null ? String(Math.round(it[k] * 10)) : ""; });
+  return p;
+}
+CUT_FIELDS.forEach(k => $("c-" + k).addEventListener("input", () => {
+  const it = cutItem(); if (!it) return;
+  const v = $("c-" + k).value;
+  it.cutParams = Object.assign({}, it.cutParams, { [k]: v });
+  if (SHARED.includes(k)) state.cutDefaults = Object.assign({}, state.cutDefaults, { [k]: v });
+  save();
+}));
+function openCut(id) {
+  cutId = id; $("cut").hidden = false; renderCut();
+  try { $("cut").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); } catch {}
+}
+$("cut-close").onclick = () => { cutId = null; $("cut").hidden = true; };
+
+function cutPrompt(it, p, imgs, current, ask) {
+  return `Jesteś doświadczonym technologiem stolarskim i projektantem mebli na wymiar. ${current ? "Popraw istniejący rozkrój mebla zgodnie z prośbą użytkownika, resztę zostaw bez zmian (także ręczne poprawki)." : "Rozpisz poniższy mebel na formatki do zamówienia rozkroju i oklejania w hurtowni płyt."}
+
+Mebel: ${it.name} (${it.room})${it.category ? `, kategoria: ${it.category}` : ""}
+Materiał i kolor z zestawienia: ${[it.material, it.color].filter(Boolean).join(", ") || "—"}
+Uwagi z zestawienia: ${it.notes || "—"}
+Wymiary zewnętrzne (szer. × gł. × wys.): ${p.w || "?"} × ${p.d || "?"} × ${p.h || "?"} mm
+Płyta korpusu: ${p.board}, grubość ${p.boardT} mm
+Fronty: ${p.front}, grubość ${p.frontT} mm
+Uchwyty i frezy frontów: ${p.handle}
+Plecy: ${p.back}
+Obrzeże: ${p.edge}
+Cokół: ${nv(p.plinth) > 0 ? p.plinth + " mm" : "brak (nóżki albo mebel wiszący)"}
+Szczelina między frontami: ${p.gap} mm
+Podział i wnętrze: ${p.desc || "zaproponuj funkcjonalny podział i opisz go w construction"}
+Dane mieszkania: ${dataBlock(readForm()).replace(/\n/g, "; ")}
+${imgs.length ? "\n" + imageBlock(imgs) + "\nJeśli ten mebel jest na obrazach, odczytaj z nich podział frontów, uchwyty i frezy." : ""}
+${current ? `\nAktualny rozkrój (JSON):\n${JSON.stringify(current)}\n\nProśba użytkownika:\n${ask}\n` : ""}
+Zasady:
+- Wszystkie wymiary w milimetrach, jako gotowe wymiary formatek (z obrzeżem), tak jak przyjmują je hurtownie.
+- L to wymiar wzdłuż słojów / wzoru płyty, W to wymiar poprzeczny. "grain": true dla dekorów ze słojami lub wzorem (np. dąb), false dla jednolitych kolorów.
+- Konstrukcja musi się zgadzać arytmetycznie: uwzględnij grubość płyty (boki, wieńce, przegrody), cokół, szczeliny frontów, luzy systemu drzwi przesuwnych i głębokość rowka pod plecy. W "construction" krótko opisz przyjęte założenia (np. wieńce między bokami, plecy w rowku 10 mm od tyłu).
+- Każda formatka osobno; identyczne łącz przez "qty". Grupy: Korpus, Przegrody i półki, Plecy, Fronty, Szuflady, Cokół i blendy, Inne.
+- "edges": które krawędzie okleić. l1 i l2 to dwie krawędzie o długości L, w1 i w2 to dwie krawędzie o długości W. Plecy z HDF bez obrzeża.
+- "mill": frez lub obróbka tej formatki, np. "frez uchwytowy J na górnej krawędzi, dł. 300 mm", "ramka shaker 70 mm, głęb. 4 mm", "rowek 4×8 mm pod plecy, 10 mm od tylnej krawędzi". Pusty, jeśli brak.
+- "ops": obróbki do zlecenia: nawierty puszek zawiasów Ø35 (ilość, odległość od krawędzi), rowki, frezy uchwytów, nawierty pod półkonośniki i konfirmaty, przelotki.
+- Zawiasy w drzwiach uchylnych: do 900 mm wysokości 2 szt., do 1600 mm 3 szt., do 2000 mm 4 szt., powyżej 5 szt.
+- "hardware": wszystkie okucia z ilościami: zawiasy (typ, cichy domyk), prowadnice (typ, długość), system drzwi przesuwnych z szynami, drążki z uchwytami, nóżki, uchwyty, konfirmaty, kołki, półkonośniki.
+- Maksymalny format płyty to ${SHEET.L} × ${SHEET.W} mm. Większy element podziel i napisz to w notes.
+
+Odpowiedz WYŁĄCZNIE jednym obiektem JSON:
+{"construction":"...","panels":[{"group":"Korpus","name":"Bok lewy","qty":1,"L":2580,"W":600,"t":18,"material":"płyta laminowana biała","grain":false,"edges":{"l1":true,"l2":false,"w1":true,"w2":false},"mill":"","notes":""}],"ops":[{"part":"Bok lewy","op":"Nawiert puszek zawiasów Ø35","params":"22 mm od krawędzi frontu","qty":4}],"hardware":[{"name":"Zawias puszkowy 110° z cichym domykiem","qty":8,"notes":""}],"questions":["..."]}`;
+}
+function normalizeCut(r) {
+  if (!r || !Array.isArray(r.panels)) throw { code: "invalid_json" };
+  return {
+    construction: String(r.construction || ""),
+    panels: r.panels.map(p => ({
+      group: String(p.group || "Inne"), name: String(p.name || "Formatka"), qty: Math.max(1, Math.round(nv(p.qty) || 1)),
+      L: nv(p.L), W: nv(p.W), t: nv(p.t), material: String(p.material || ""), grain: !!p.grain,
+      edges: { l1: !!p.edges?.l1, l2: !!p.edges?.l2, w1: !!p.edges?.w1, w2: !!p.edges?.w2 },
+      mill: String(p.mill || ""), notes: String(p.notes || "")
+    })),
+    ops: (Array.isArray(r.ops) ? r.ops : []).map(o => ({ part: String(o.part || ""), op: String(o.op || ""), params: String(o.params || ""), qty: Math.max(1, Math.round(nv(o.qty) || 1)) })),
+    hardware: (Array.isArray(r.hardware) ? r.hardware : []).map(h => ({ name: String(h.name || ""), qty: Math.max(1, Math.round(nv(h.qty) || 1)), notes: String(h.notes || "") })),
+    questions: Array.isArray(r.questions) ? r.questions.map(String).filter(Boolean) : []
+  };
+}
+$("c-go").onclick = () => {
+  const it = cutItem(); if (!it) return;
+  const p = cutParams(it);
+  if (!p.w || !p.d || !p.h) { setStatus("Podaj wymiary zewnętrzne mebla w mm.", true, false, "c-status"); return; }
+  const imgs = usableImages();
+  run(cutPrompt(it, p, imgs), imgs, "Rozpisuję na formatki", res => { it.cut = normalizeCut(res); return `Gotowe: ${it.cut.panels.reduce((s, x) => s + x.qty, 0)} formatek.`; }, "c-status");
+};
+$("cut-refine").onclick = () => {
+  const it = cutItem(); if (!it?.cut) return;
+  const ask = $("cut-ask").value.trim(); if (!ask) { $("cut-ask").focus(); return; }
+  const imgs = usableImages();
+  run(cutPrompt(it, cutParams(it), imgs, it.cut, ask), imgs, "Poprawiam rozkrój", res => { it.cut = normalizeCut(res); return "Rozkrój poprawiony."; }, "cut-rst")
+    .then(ok => { if (ok) $("cut-ask").value = ""; });
+};
+
+const fits = p => !p.L || !p.W || (p.grain ? p.L <= SHEET.L && p.W <= SHEET.W : Math.max(p.L, p.W) <= SHEET.L && Math.min(p.L, p.W) <= SHEET.W);
+function cutStats(c) {
+  const area = {}; let edge = 0, pcs = 0;
+  c.panels.forEach(p => {
+    const q = p.qty || 1; pcs += q;
+    const key = p.material + (p.t ? ` · ${p.t} mm` : "");
+    area[key] = (area[key] || 0) + q * (p.L || 0) * (p.W || 0) / 1e6;
+    edge += q * (((p.edges.l1 ? 1 : 0) + (p.edges.l2 ? 1 : 0)) * (p.L || 0) + ((p.edges.w1 ? 1 : 0) + (p.edges.w2 ? 1 : 0)) * (p.W || 0)) / 1000;
+  });
+  return { area, edge, pcs };
+}
+function commitCut() { save(); render(); }
+function cell(text, onSave, cls) { const td = document.createElement("td"); if (cls) td.className = cls; td.append(editable(text ?? "", onSave)); return td; }
+function head(t, cols) {
+  t.textContent = ""; const th = document.createElement("thead"); const tr = document.createElement("tr");
+  cols.forEach(([l, num]) => { const h = document.createElement("th"); h.textContent = l; if (num) h.className = "num"; tr.append(h); });
+  th.append(tr); t.append(th); const tb = document.createElement("tbody"); t.append(tb); return tb;
+}
+function delBtn(label, fn) { const td = document.createElement("td"); const b = document.createElement("button"); b.type = "button"; b.className = "del"; b.textContent = "×"; b.setAttribute("aria-label", "Usuń " + label); b.onclick = fn; td.append(b); return td; }
+function tog(label, on, fn, aria) { const b = document.createElement("button"); b.type = "button"; b.className = "tog"; b.textContent = label; b.setAttribute("aria-pressed", String(!!on)); b.setAttribute("aria-label", aria); b.onclick = fn; return b; }
+
+function renderCut() {
+  const it = cutItem();
+  if (!it) { cutId = null; $("cut").hidden = true; return; }
+  $("cut-h").textContent = "Rozkrój: " + it.name;
+  $("cut-room").textContent = it.room;
+  const p = cutParams(it);
+  CUT_FIELDS.forEach(k => { const el = $("c-" + k); if (document.activeElement !== el) el.value = p[k] ?? ""; });
+  const c = it.cut;
+  $("cut-res").hidden = !c; $("cut-empty").hidden = !!c;
+  if (!c) return;
+
+  $("cut-construction").textContent = c.construction; $("cut-construction").hidden = !c.construction;
+  const s = cutStats(c);
+  const tiles = $("cut-tiles"); tiles.textContent = "";
+  const tile = (v, t) => { const d = document.createElement("div"); d.className = "tile"; d.innerHTML = `<span class="v"></span><span class="s"></span>`; d.children[0].textContent = v; d.children[1].textContent = t; tiles.append(d); };
+  tile(String(s.pcs), "formatek");
+  tile(fmt(s.edge, 1) + " mb", "obrzeża");
+  Object.entries(s.area).forEach(([k, a]) => tile(fmt(a, 2) + " m²", `${k} · ok. ${Math.max(1, Math.ceil(a / (SHEET.L * SHEET.W / 1e6 * 0.8)))} ark.`));
+
+  // panels
+  const tb = head($("cut-panels"), [["Lp.", 1], ["Nazwa"], ["Szt.", 1], ["Dł. L (mm)", 1], ["Szer. W (mm)", 1], ["Gr.", 1], ["Materiał"], ["Słoje"], ["Obrzeże"], ["Frez / obróbka"], ["Uwagi"], [""]]);
+  const groups = []; c.panels.forEach(x => { if (!groups.includes(x.group)) groups.push(x.group); });
+  let lp = 0; const over = [];
+  groups.forEach(g => {
+    const gr = document.createElement("tr"); gr.className = "grp"; const gtd = document.createElement("td"); gtd.colSpan = 12;
+    const list = c.panels.filter(x => x.group === g);
+    gtd.textContent = `${g} · ${list.reduce((a, x) => a + x.qty, 0)} szt.`; gr.append(gtd); tb.append(gr);
+    list.forEach(x => {
+      lp++;
+      const tr = document.createElement("tr");
+      if (!fits(x)) { tr.classList.add("over"); over.push(`${lp}. ${x.name}`); }
+      const lpd = document.createElement("td"); lpd.className = "lp"; lpd.textContent = lp; tr.append(lpd);
+      const name = cell(x.name, v => { x.name = v; commitCut(); }); name.firstChild.style.fontWeight = "600"; tr.append(name);
+      ["qty", "L", "W", "t"].forEach(k => tr.append(cell(x[k] == null ? "" : String(x[k]), v => { const n = nv(v); x[k] = k === "qty" ? Math.max(1, Math.round(n || 1)) : n; commitCut(); }, "num")));
+      tr.append(cell(x.material, v => { x.material = v; commitCut(); }));
+      const gtd2 = document.createElement("td"); gtd2.append(tog(x.grain ? "↕" : "—", x.grain, () => { x.grain = !x.grain; commitCut(); }, "Kierunek słojów: " + (x.grain ? "tak" : "nie"))); tr.append(gtd2);
+      const etd = document.createElement("td"); const ed = document.createElement("span"); ed.className = "edges";
+      [["l1", "L1"], ["l2", "L2"], ["w1", "S1"], ["w2", "S2"]].forEach(([k, l]) => ed.append(tog(l, x.edges[k], () => { x.edges[k] = !x.edges[k]; commitCut(); }, `Obrzeże ${l}`)));
+      etd.append(ed); etd.style.padding = "4px 6px"; tr.append(etd);
+      tr.append(cell(x.mill, v => { x.mill = v; commitCut(); }));
+      tr.append(cell(x.notes, v => { x.notes = v; commitCut(); }));
+      tr.append(delBtn(x.name, () => { c.panels.splice(c.panels.indexOf(x), 1); commitCut(); }));
+      tb.append(tr);
+    });
+  });
+  $("cut-warn").textContent = over.length ? `Większe niż arkusz ${SHEET.L}×${SHEET.W} mm: ${over.join(", ")}. Podziel te elementy albo zmień kierunek słojów.` : "";
+
+  // ops
+  const ob = head($("cut-ops"), [["Element"], ["Obróbka"], ["Parametry"], ["Ilość", 1], [""]]);
+  c.ops.forEach((o, i) => {
+    const tr = document.createElement("tr");
+    tr.append(cell(o.part, v => { o.part = v; commitCut(); }), cell(o.op, v => { o.op = v; commitCut(); }), cell(o.params, v => { o.params = v; commitCut(); }),
+      cell(String(o.qty), v => { o.qty = Math.max(1, Math.round(nv(v) || 1)); commitCut(); }, "num"), delBtn(o.op, () => { c.ops.splice(i, 1); commitCut(); }));
+    ob.append(tr);
+  });
+  // hardware
+  const hb = head($("cut-hw"), [["Okucie"], ["Ilość", 1], ["Uwagi"], [""]]);
+  c.hardware.forEach((h, i) => {
+    const tr = document.createElement("tr");
+    tr.append(cell(h.name, v => { h.name = v; commitCut(); }), cell(String(h.qty), v => { h.qty = Math.max(1, Math.round(nv(v) || 1)); commitCut(); }, "num"),
+      cell(h.notes, v => { h.notes = v; commitCut(); }), delBtn(h.name, () => { c.hardware.splice(i, 1); commitCut(); }));
+    hb.append(tr);
+  });
+  $("cut-qs").hidden = !c.questions.length;
+  const ql = $("cut-qlist"); ql.textContent = "";
+  c.questions.forEach(q => { const li = document.createElement("li"); li.textContent = q; ql.append(li); });
+}
+$("cut-addp").onclick = () => { const it = cutItem(); if (!it?.cut) return; const p = cutParams(it);
+  it.cut.panels.push({ group: "Inne", name: "Nowa formatka", qty: 1, L: null, W: null, t: nv(p.boardT) || 18, material: p.board, grain: false, edges: { l1: false, l2: false, w1: false, w2: false }, mill: "", notes: "" }); commitCut(); };
+$("cut-addo").onclick = () => { const it = cutItem(); if (!it?.cut) return; it.cut.ops.push({ part: "", op: "Nowa obróbka", params: "", qty: 1 }); commitCut(); };
+$("cut-addh").onclick = () => { const it = cutItem(); if (!it?.cut) return; it.cut.hardware.push({ name: "Nowe okucie", qty: 1, notes: "" }); commitCut(); };
+
+function slug(s) { return (s || "").toLowerCase().replace(/[^a-z0-9ąćęłńóśźż]+/gi, "-").replace(/^-|-$/g, "") || "formatki"; }
+$("cut-csv").onclick = async () => {
+  const it = cutItem(); if (!it?.cut || !downloads) return;
+  const esc = v => { const s = String(v ?? ""); return /[;"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s; };
+  const X = b => b ? "X" : "";
+  const rows = [["Lp", "Grupa", "Nazwa", "Materiał", "Grubość mm", "Długość mm", "Szerokość mm", "Ilość", "Słoje", "Obrzeże L1", "Obrzeże L2", "Obrzeże S1", "Obrzeże S2", "Frez / obróbka", "Uwagi"]];
+  let lp = 0; const groups = []; it.cut.panels.forEach(x => { if (!groups.includes(x.group)) groups.push(x.group); });
+  groups.forEach(g => it.cut.panels.filter(x => x.group === g).forEach(x => rows.push([++lp, x.group, x.name, x.material, x.t ?? "", x.L ?? "", x.W ?? "", x.qty, x.grain ? "wzdłuż L" : "", X(x.edges.l1), X(x.edges.l2), X(x.edges.w1), X(x.edges.w2), x.mill, x.notes])));
+  rows.push([], ["OBRÓBKI"], ["Element", "Obróbka", "Parametry", "Ilość"]);
+  it.cut.ops.forEach(o => rows.push([o.part, o.op, o.params, o.qty]));
+  rows.push([], ["OKUCIA"], ["Okucie", "Ilość", "Uwagi"]);
+  it.cut.hardware.forEach(h => rows.push([h.name, h.qty, h.notes]));
+  const csv = "﻿" + rows.map(r => r.map(esc).join(";")).join("\r\n");
+  try { const r = await downloads.save({ filename: `formatki-${slug(it.room)}-${slug(it.name)}.csv`, data: csv }); if (r?.status === "saved") toast("Zapisano CSV"); }
+  catch (e) { if (e?.code === "unavailable") $("cut-csv").hidden = true; }
+};
+$("cut-copy").onclick = async () => {
+  const it = cutItem(); if (!it?.cut) return;
+  const c = it.cut, p = cutParams(it), L = [`${it.name} (${it.room}) — ${p.w}×${p.d}×${p.h} mm`];
+  if (c.construction) L.push(c.construction);
+  let lp = 0; const groups = []; c.panels.forEach(x => { if (!groups.includes(x.group)) groups.push(x.group); });
+  groups.forEach(g => {
+    L.push(`\n${g.toUpperCase()}`);
+    c.panels.filter(x => x.group === g).forEach(x => {
+      const e = [["l1", "L1"], ["l2", "L2"], ["w1", "S1"], ["w2", "S2"]].filter(([k]) => x.edges[k]).map(([, l]) => l).join(" ");
+      L.push(`${++lp}. ${x.name} — ${x.qty} szt. — ${x.L ?? "?"} × ${x.W ?? "?"} × ${x.t ?? "?"} mm, ${x.material}${x.grain ? ", słoje wzdłuż L" : ""}${e ? ", obrzeże: " + e : ""}${x.mill ? ", frez: " + x.mill : ""}${x.notes ? " (" + x.notes + ")" : ""}`);
+    });
+  });
+  if (c.ops.length) { L.push("\nOBRÓBKI"); c.ops.forEach(o => L.push(`• ${o.part}: ${o.op}${o.params ? " — " + o.params : ""} (${o.qty})`)); }
+  if (c.hardware.length) { L.push("\nOKUCIA"); c.hardware.forEach(h => L.push(`• ${h.qty}× ${h.name}${h.notes ? " — " + h.notes : ""}`)); }
+  const s = cutStats(c);
+  L.push(`\nRazem: ${s.pcs} formatek, ${fmt(s.edge, 1)} mb obrzeża; ` + Object.entries(s.area).map(([k, a]) => `${k}: ${fmt(a, 2)} m²`).join("; "));
+  const text = L.join("\n");
+  try { await navigator.clipboard.writeText(text); toast("Skopiowano"); }
+  catch { const ta = $("copyout"); ta.hidden = false; ta.value = text; ta.focus(); ta.select(); toast("Zaznaczono tekst — skopiuj Ctrl+C"); }
+};
 
 render();
 })();
